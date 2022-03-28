@@ -1,4 +1,4 @@
-##Leitura dos ficheiros de interações obtidos através de bases de dados: APID, DOROTHEA e OMNIPATH para Homo sp.
+##Reads interaction files obtained through the following data bases: APID, DOROTHEA and OMNIPATH for Homo sp.
 
 apid <- read.delim("9606_noISI_Q2.txt",header=T, stringsAsFactors = F)
 
@@ -8,59 +8,64 @@ omni <- omni[omni$is_directed==1,]
 
 dorothea <- read.delim("dorothea_AB.txt",header=T, stringsAsFactors = F)
 
-##Extração de lista de proteínas que interagem fisicamente com uma das subunidades do NFkB
+##Extracts lists of uniprot identifiers of proteins that interact with at least one of NF-kB sub units
 
-# NFKBI (P105 -> P50) - P19838
+# NFKBI (P105 or P50) - P19838
 # RELA (P65) - Q04206
 
-linhasAPID_N1 <- which(apid$UniprotID_A=="P19838")   
-linhasAPID_R1 <- which(apid$UniprotID_A=="Q04206")   
-linhasAPID_1 <- union(linhasAPID_N1,linhasAPID_R1)
-
-interactores_apid_1 <- apid$UniprotID_B[linhasAPID_1]
-
-linhasAPID_N2 <- which(apid$UniprotID_B=="P19838")   
-linhasAPID_R2 <- which(apid$UniprotID_B=="Q04206")   
-linhasAPID_2 <- union(linhasAPID_N2,linhasAPID_R2)  
-
-interactores_apid_2 <- apid$UniprotID_A[linhasAPID_2]
-
-interactores_apid <- union(interactores_apid_1, interactores_apid_2)
-
-rm(interactores_apid_1, interactores_apid_2, linhasAPID_1, linhasAPID_2, 
-   linhasAPID_N1, linhasAPID_N2, linhasAPID_R1, linhasAPID_R2)
-
-##Extração de lista de genes que são regulados pelo NFkB
+source("R/Auxiliar_functions.R")
 
 
-linhas_alvos_omni_N <- which(omni$source=="P19838")   
-linhas_alvos_omni_R <- which(omni$source=="Q04206")    
+linesAPID_N1 <- which(apid$UniprotID_A=="P19838")   
+linesAPID_R1 <- which(apid$UniprotID_A=="Q04206")   
+linesAPID_1 <- union(linesAPID_N1,linesAPID_R1)
 
-alvos_omni <- union(omni$target[linhas_alvos_omni_N],omni$target[linhas_alvos_omni_R])
+interactors_apid_1 <- apid$UniprotID_B[linesAPID_1]
 
-rm(linhas_alvos_omni_N,linhas_alvos_omni_R)
+linesAPID_N2 <- which(apid$UniprotID_B=="P19838")   
+linesAPID_R2 <- which(apid$UniprotID_B=="Q04206")   
+linesAPID_2 <- union(linesAPID_N2,linesAPID_R2)  
 
-##lista com a união dos alvos que tem como fontes NFKB ou RELA
+interactors_apid_2 <- apid$UniprotID_A[linesAPID_2]
 
-linhas_alvos_dorothea_N <- which(dorothea$source=="P19838")
-linhas_alvos_dorothea_R <- which(dorothea$source=="Q04206")
+interactors_apid <- union(interactors_apid_1, interactors_apid_2)
 
-alvos_dorothea <- union(dorothea$target[linhas_alvos_dorothea_N],dorothea$target[linhas_alvos_dorothea_R])
+rm(interactors_apid_1, interactors_apid_2, linesAPID_1, linesAPID_2, 
+   linesAPID_N1, linesAPID_N2, linesAPID_R1, linesAPID_R2)
 
-alvos <- union(alvos_omni,alvos_dorothea)
-rm(linhas_alvos_dorothea_N,linhas_alvos_dorothea_R,alvos_dorothea,alvos_omni)
+#We opted to remove, rm(), some unnecessary variables through out the programm
 
-##Extração de lista de genes que regulam o NFkB
-linhas_reguladores_omni_N <- which(omni$target=="P19838")
-linhas_reguladores_omni_R <- which(omni$target=="Q04206")
-
-reguladores_omni <- union(omni$source[linhas_reguladores_omni_N],omni$source[linhas_reguladores_omni_R])
+##Extracts the same objects, but know, those must be NF-kB subunits' regulators
 
 
-linhas_reguladores_dorothea_N <- which(dorothea$target=="P19838")
-linhas_reguladores_dorothea_R <- which(dorothea$target=="Q04206")
+lines_targets_omni_N <- which(omni$source=="P19838")   
+lines_targets_omni_R <- which(omni$source=="Q04206")    
 
-reguladores_dorothea <- union(dorothea$source[linhas_reguladores_dorothea_N],dorothea$source[linhas_reguladores_dorothea_R])
+targets_omni <- union(omni$target[lines_targets_omni_N],omni$target[lines_targets_omni_R])
+
+rm(lines_targets_omni_N,lines_targets_omni_R)
+
+##List with the union of targets that have as source either NFkB1 or RelA
+
+lines_targets_dorothea_N <- which(dorothea$source=="P19838")
+lines_targets_dorothea_R <- which(dorothea$source=="Q04206")
+
+targets_dorothea <- union(dorothea$target[lines_targets_dorothea_N],dorothea$target[lines_targets_dorothea_R])
+
+targets <- union(targets_omni,targets_dorothea)
+rm(llines_targets_dorothea_R,lines_targets_dorothea_N,targets_dorothea,targets_omni)
+
+##Extraction of list of Uniprot indentifiers of proteins that regulate at least one of NF-kB's subunit
+lines_regulators_omni_N <- which(omni$target=="P19838")
+lines_regulators_omni_R <- which(omni$target=="Q04206")
+
+regulators_omni <- union(omni$source[lines_regulators_omni_N],omni$source[lines_regulators_omni_R])
+
+
+lines_regulators_dorothea_N <- which(dorothea$target=="P19838")
+lines_regulators_dorothea_R <- which(dorothea$target=="Q04206")
+
+regulators_dorothea <- union(dorothea$source[lines_regulators_dorothea_N],dorothea$source[linhas_reguladores_dorothea_R])
 
 reguladores <- union(reguladores_omni,reguladores_dorothea)
 
@@ -125,15 +130,6 @@ interseção           <- intersect(ciclosretro_ensemble, intersect(helaprot$Gen
 
 #Uso de lista de indentificador ENSEMBL, presente nos dois data frames em estudo, em vez do UNIPROT
 ciclosretro_ensemble <- mapIds(org.Hs.eg.db, keys=ciclosretro,column="ENSEMBL", keytype = "UNIPROT")
-index_gene_help <- function(tabela, amostra=interseção){
-  linhas = c()
-  for (i in 1:length(tabela$Gene.ID)){
-    if (tabela$Gene.ID[i] %in% amostra){
-     linhas <- append(linhas,i)
-    }
-  }
-  return(linhas)
-}
 
 hela_cr        <- helaprot[index_gene_help(helaprot),]
 tissue_cr      <- tissue_exp[index_gene_help(tissue_exp),]
@@ -152,50 +148,6 @@ hela_cr <- hela_cr[order(hela_cr$Gene.ID),]
 
 library(devtools)
 library(easyGgplot2)
-#library("ggpubr")
 
-Multiple_cor_tests <- function(test_table){
-  names <- colnames(test_table)
-  df <- data.frame()
-  not_possible <- c()
-  for (i in 3:length(names)){
-    correct = c()
-    for (l in 1:length(test_table[,i])){
-      if (is.na(test_table[l,i])==FALSE && test_table[l,i]>1) {
-        correct <- append(correct,test_table[l,1])
-      }
-    }
-    if (length(correct)<10){
-      not_possible <- append(not_possible, names(i))
-    }
-    else{
-      amostra_hl <- hela_cr[index_gene_help(hela_cr, amostra = correct),3]
-      amostra_table_i <- test_table[index_gene_help(test_table, amostra = correct), i]
-      
-      teste <- cor.test(amostra_hl, amostra_table_i, method="pearson")
-      df[i-2, 1] <- names[i]
-      df[i-2, 2] <- teste$estimate
-      df[i-2, 3] <- teste$p.value
-      df[i-2, 4] <- length(correct)
-    }
-  }  
-  
-  if (length(not_possible)!= 0){
-    print("The following tissues were not elegible for correlation test with the data for the cancerous cell line HeLa:", not_possible)
-  }
-  
-  colnames(df) <- c("Tissues_to_compare","Correlation_coefficient","p_value", "Dimension")
-  df <- df[order(df$Correlation_coefficient),]
-  print(df)
-
-  plot <- ggplot(df, aes(x = Correlation_coefficient, y=reorder(Tissues_to_compare, + Correlation_coefficient), fill = p_value)) +
-          labs(x = "Coeficiente de correlação, cf. HeLa", y = "Tecidos estudados")+
-          scale_fill_gradientn(trans = "log", breaks=c(1.0e-25, 1.0e-20, 1e-15, 1.0e-10, 1.0e-5, 1.0e-1), colors = colorspace::diverge_hcl(7))+
-          geom_bar(stat="identity",color="black")+
-          guides(fill = guide_colourbar(barwidth = 0.5, barheight = 10))+
-          theme_classic()
-  
-  return(plot)
-}
 
 Multiple_cor_tests(tissue_cr)

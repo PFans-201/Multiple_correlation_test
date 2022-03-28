@@ -1,4 +1,4 @@
-##Importar os ficheiros das interacções para o R
+##Leitura dos ficheiros de interações obtidos através de bases de dados: APID, DOROTHEA e OMNIPATH para Homo sp.
 
 apid <- read.delim("9606_noISI_Q2.txt",header=T, stringsAsFactors = F)
 
@@ -8,7 +8,7 @@ omni <- omni[omni$is_directed==1,]
 
 dorothea <- read.delim("dorothea_AB.txt",header=T, stringsAsFactors = F)
 
-##Extrair a lista de proteínas que interagem fisicamente com uma das subunidades do NFkB>>
+##Extração de lista de proteínas que interagem fisicamente com uma das subunidades do NFkB
 
 # NFKBI (P105 -> P50) - P19838
 # RELA (P65) - Q04206
@@ -30,7 +30,8 @@ interactores_apid <- union(interactores_apid_1, interactores_apid_2)
 rm(interactores_apid_1, interactores_apid_2, linhasAPID_1, linhasAPID_2, 
    linhasAPID_N1, linhasAPID_N2, linhasAPID_R1, linhasAPID_R2)
 
-##Extrair a lista de genes que são regulados pelo NFkB>>
+##Extração de lista de genes que são regulados pelo NFkB
+
 
 linhas_alvos_omni_N <- which(omni$source=="P19838")   
 linhas_alvos_omni_R <- which(omni$source=="Q04206")    
@@ -39,7 +40,7 @@ alvos_omni <- union(omni$target[linhas_alvos_omni_N],omni$target[linhas_alvos_om
 
 rm(linhas_alvos_omni_N,linhas_alvos_omni_R)
 
-##lista com a união dos alvos que tem como fontes NFKB ou RELA>>
+##lista com a união dos alvos que tem como fontes NFKB ou RELA
 
 linhas_alvos_dorothea_N <- which(dorothea$source=="P19838")
 linhas_alvos_dorothea_R <- which(dorothea$source=="Q04206")
@@ -49,7 +50,7 @@ alvos_dorothea <- union(dorothea$target[linhas_alvos_dorothea_N],dorothea$target
 alvos <- union(alvos_omni,alvos_dorothea)
 rm(linhas_alvos_dorothea_N,linhas_alvos_dorothea_R,alvos_dorothea,alvos_omni)
 
-##Extrair a lista de genes que regulam o NFkB>>
+##Extração de lista de genes que regulam o NFkB
 linhas_reguladores_omni_N <- which(omni$target=="P19838")
 linhas_reguladores_omni_R <- which(omni$target=="Q04206")
 
@@ -66,13 +67,13 @@ reguladores <- union(reguladores_omni,reguladores_dorothea)
 rm(linhas_reguladores_omni_N,linhas_reguladores_omni_R,reguladores_omni, linhas_reguladores_dorothea_N, 
    linhas_reguladores_dorothea_R, reguladores_dorothea, reguladores_omni)
 
-##Fazer as intersecções entre essas listas>>
+##Intersecção entre essas listas
 
 alvos_e_reguladores <- intersect(alvos,reguladores)
 alvos_e_interactores <- intersect(alvos,interactores_apid)
 reguladores_e_interactores <- intersect(reguladores,interactores_apid)  
 
-##Avaliar se as intersecções são maiores do que o esperado ao acaso com um teste hipergeométrico>>
+##Avaliar se as intersecções são maiores do que o esperado ao acaso com um teste hipergeométrico - FDR (false discovery rate)
 
 #lista de todos os alvos
 todos_apid <- union(apid$UniprotID_A,apid$UniprotID_B)
@@ -104,24 +105,26 @@ p_r_i <- phyper(r_i-1,r,t-r,i,lower.tail=F) #NÃO USAR - muitos dos reguladores
 
 rm(a_r, a_i, r_i, t, a, r, i)
 
-##Retirar às três listas de genes/proteínas aquelas que aparecem em mais do que uma lista>>
+##Retirar às três listas de genes/proteínas aquelas que aparecem em mais do que uma lista
 
 ciclosretro <- union(alvos_e_interactores, alvos_e_reguladores) #Inclui todos os candidatos de compostos pertencentes a ciclos de retroação com o NF-kB
 
+
 ##Criar e intersetar a base de dados de interatores e reguladores com os dados de expressão por RNAseq para HeLa e tecidos humanos
 
-#library(clusterProfiler)
 library(org.Hs.eg.db)
 
-#from: RNA-seq of 675 commonly used human cancer cell lines, in Atlas expression
+#from: RNA-seq data of 675 commonly used human cancer cell lines, in Atlas expression
 helaprot <- read.delim("HeLa_TPM_results.tsv",header=T, skip = 4 ,stringsAsFactors = F)
 colnames(helaprot)[3] <- "HeLa"
 helaprot <- helaprot[!is.na(helaprot$HeLa),]
 
-ciclosretro_ensemble <- mapIds(org.Hs.eg.db, keys=ciclosretro,column="ENSEMBL", keytype = "UNIPROT")
+#from: RNA-seq data of 53 human tissues from paper GTEx, in Atlas expression
 tissue_exp           <- read.delim("E-MTAB-5214-query-results.tsv",header=T, skip = 4 ,stringsAsFactors = FALSE)
 interseção           <- intersect(ciclosretro_ensemble, intersect(helaprot$Gene.ID, tissue_exp$Gene.ID))
 
+#Uso de lista de indentificador ENSEMBL, presente nos dois data frames em estudo, em vez do UNIPROT
+ciclosretro_ensemble <- mapIds(org.Hs.eg.db, keys=ciclosretro,column="ENSEMBL", keytype = "UNIPROT")
 index_gene_help <- function(tabela, amostra=interseção){
   linhas = c()
   for (i in 1:length(tabela$Gene.ID)){

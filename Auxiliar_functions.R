@@ -4,17 +4,39 @@
 #from (a) certain column(s) of a data frame (cln), and returns a list 
 #of all the objects found (union)
 
-fd_objects_frm_cln_union <- function(df,cln =  c(), objs = c()){
-  list_of_lines <-  c()
+fd_objects_frm_cln_union <- function(df, cln =  c(search_, get_), objs = c(), vice_versa = TRUE){
+  list_of_lines  <-  c()
+  list_of_lines_ <-  c()
+  
+  #NOTE: cln is a vetctor of paired columns, one to search information, and another to get information from
   for (o in 1:length(objs)){
-    lines <- c()
-    for (c in 1:length(cln)){
-      
+    if (vice_versa == TRUE){
+      list_of_lines  <- append(list_of_lines,  which(df[,1]==cln[o]))
+      list_of_lines_ <- append(list_of_lines_, which(df[,2]==cln[o]))
+    }
+    else{
+      list_of_lines  <- append(list_of_lines,  which(df[,1]==cln[o]))
     }
   }
+  if (is.null(list_of_lines_) == FALSE){
+    vice    <- table[unique(list_of_lines) , cln[2]]
+    versa   <- table[unique(list_of_lines_), cln[1]]
+    results <- list("vice" = vice,"versa" = versa)
+  }
+  else {
+    results <- table[unique(list_of_lines) , cln[2]] 
+  }
+  
+  return(results)
 }
 
 
+#Calculates the FDR, false discovery rate, through a hypergeometric test 
+#for multiple group intersections with shared universe
+
+FDR_phyper_multiple_calc <- function(universe, groups = c(), inters_grp = list(), lower_tail = FALSE){
+  sizes <- list("universe" = length(universe), )
+}
 
 #
 

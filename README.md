@@ -1,11 +1,10 @@
 # Multiple_correlation_test
-Program useful to run multiple correlation tests between a main data, in this case, RNAseq data for HeLa cell line, and various variables present in a data frame, corresponding here to human tissues from GTEx data, all acquired from Atlas Expression./n/n
+<p>Program useful to run multiple correlation tests between a main data, in this case, RNAseq data for HeLa cell line, and various variables present in a data frame, corresponding here to human tissues from GTEx data, all acquired from Atlas Expression.</p>
 
-Set working directory:/n
-Keep every .txt file in the same folder as the programm then set the folder as the 'working directory' in the RStudio 'New Project' option/n/n
+<p><b>Set working directory:</b> Keep every .txt file in the same folder as the programm then set the folder as the 'working directory' in the RStudio 'New Project' option.</p>
 
-R language version used: 4.1.3/n/n
-Libraries used:/n
--org.Hs.eg.db/n
--devtools/n
--easyGgplot2/n
+<p><b>R language version used:</b>  4.1.3</p>
+<p><b>Libraries used:</b> </p>
+<ul>org.Hs.eg.db</ul>
+<ul>devtools</ul>
+<ul>easyGgplot2</ul>

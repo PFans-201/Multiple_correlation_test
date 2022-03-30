@@ -13,13 +13,13 @@ dorothea <- read.delim("dorothea_AB.txt",header=T, stringsAsFactors = F)
 # NFKBI (P105 or P50) - P19838
 # RELA (P65) - Q04206
 
-source("R/Auxiliar_functions.R")
+source("Auxiliar_functions.R")
 
 subunits      <- c("P19838","Q04206")
 apid_cln_pair <- c("UniprotID_A", "UniprotID_B")
 
-filtered_apid   <- fd_objects_frm_cln_union(apid, cln =  apid_cln_pair, objs = subunits, vice_versa = TRUE)
-interators_apid <- union(filtered_apid$vice, filtered_apid$versa)
+filtered_apid   <- fd_objects_frm_cln_union(apid, cln = apid_cln_pair, objs = subunits, vice_versa = TRUE)
+interactors_apid <- union(filtered_apid$vice, filtered_apid$versa)
 
 ##Extracts the same objects, but know, those must be NF-kB subunits' regulators
 
@@ -27,6 +27,7 @@ omni_n_dorothea_cln_pair   <- c("source", "target")
 filtered_omni     <- fd_objects_frm_cln_union(omni,     cln = omni_n_dorothea_cln_pair, objs = subunits, vice_versa = TRUE)
 filtered_dorothea <- fd_objects_frm_cln_union(dorothea, cln = omni_n_dorothea_cln_pair, objs = subunits, vice_versa = TRUE)
 
+rm(subunits,omni_n_dorothea_cln_pair, apid_cln_pair)
 ##List with the union of targets that have as source either NFkB1 or RelA 
 
 targets    <- union(filtered_omni$vice, filtered_dorothea$vice)
@@ -36,13 +37,13 @@ targets    <- union(filtered_omni$vice, filtered_dorothea$vice)
 
 regulators <- union(filtered_omni$versa, filtered_dorothea$versa)
 
+rm(filtered_apid, filtered_dorothea, filtered_omni, omni, dorothea, apid)
 ##Intersection between lists
   
 targets_n_regulators     <- intersect(targets,   regulators)
-targets_n_interactors    <- intersect(targets,   interactores_apid)
-regulators_n_interactors <- intersect(regulators,interators_apid) 
+targets_n_interactors    <- intersect(targets,   interactors_apid)
+regulators_n_interactors <- intersect(regulators,interactors_apid) 
 
-<<ainda em PT>>
 ##Evaluates if the intersection lists are bigger then expected through FDR (false discovery rate) determinantion
 
 #construction of variable universe
@@ -51,36 +52,31 @@ universe_omni     <- union(omni$source,omni$target)
 universe_dorothea <- union(dorothea$source,dorothea$target)
 universe          <- union(universe_apid,union(universe_omni,universe_dorothea))
 
-rm(universe_apid, universe_omni, universe_dorothea)
-
-#tamanhos
-t <- length(todos)
+#sizes
+t <- length(universe)
 a <- length(targets)
-r <- length(reguladores)
-i <- length(interactores_apid)
-a_i <- length(targets_n_regulators)
-a_r <- length(alvos_e_reguladores)
-r_i <- length(reguladores_e_interactores)
+r <- length(regulators)
+i <- length(interactors_apid)
+a_i <- length(targets_n_interactors)
+a_r <- length(targets_n_regulators)
+r_i <- length(regulators_n_interactors)
 
 ##p_values>>
-#lower tail = F, logo  P[X > x]
-#q = tamanho - 1, para incluir o inteiro de "listas duplas"
+#lower tail = F, so P[X > x]
+#q = size - 1, 
 p_a_i <- phyper(a_i-1,a,t-a,i,lower.tail=F)
 p_a_r <- phyper(a_r-1,a,t-a,r,lower.tail=F)
-p_r_i <- phyper(r_i-1,r,t-r,i,lower.tail=F) #NÃO USAR - muitos dos reguladores 
-#exercem a sua função por interação física
+p_r_i <- phyper(r_i-1,r,t-r,i,lower.tail=F) 
 
-#Há um grande número de proteínas, maior do que o esperado, como interatores do NFkB - pode ter vários ciclos de retroação
-#obtêm-se p_values muito baixos, diferenças significativas (não são dados aletórios)
+#It was found a large number of proteins that interact with NF-kB, larger than expected - there may be various retroaction cycles
+#we obtained very low p_values, so our data is not random 
 
+rm(a,r,i,t,a_i,a_r,r_i,p_a_i, p_a_r, p_r_i, universe_apid, universe_omni, universe_dorothea, universe)
 
-##Retirar às três listas de genes/proteínas aquelas que aparecem em mais do que uma lista
+#creation of a list that includes every candidate for NF-kB's retroaction cycles 
+cyclesretro <- union(targets_n_interactors, targets_n_regulators) 
 
-ciclosretro <- union(alvos_e_interactores, alvos_e_reguladores) #Inclui todos os candidatos de compostos pertencentes a ciclos de retroação com o NF-kB
-
-
-##Criar e intersetar a base de dados de interatores e reguladores com os dados de expressão por RNAseq para HeLa e tecidos humanos
-
+##Creation and organization of acquired RNAseq data of HeLa cancer cell line and various human tissues
 library(org.Hs.eg.db)
 
 #from: RNA-seq data of 675 commonly used human cancer cell lines, in Atlas expression
@@ -88,30 +84,30 @@ helaprot <- read.delim("HeLa_TPM_results.tsv",header=T, skip = 4 ,stringsAsFacto
 colnames(helaprot)[3] <- "HeLa"
 helaprot <- helaprot[!is.na(helaprot$HeLa),]
 
+#Usage of ENSEMBL identifiers, present in both experimental dataframes, instead of UNIPROT
+cyclesretro_ensemble <- mapIds(org.Hs.eg.db, keys=cyclesretro,column="ENSEMBL", keytype = "UNIPROT")
+rm(cyclesretro)
 #from: RNA-seq data of 53 human tissues from paper GTEx, in Atlas expression
-tissue_exp           <- read.delim("E-MTAB-5214-query-results.tsv",header=T, skip = 4 ,stringsAsFactors = FALSE)
-interseção           <- intersect(ciclosretro_ensemble, intersect(helaprot$Gene.ID, tissue_exp$Gene.ID))
+tissue_exp            <- read.delim("E-MTAB-5214-query-results.tsv",header=T, skip = 4 ,stringsAsFactors = FALSE)
+intersection          <- intersect(cyclesretro_ensemble, intersect(helaprot$Gene.ID, tissue_exp$Gene.ID))
 
-#Uso de lista de indentificador ENSEMBL, presente nos dois data frames em estudo, em vez do UNIPROT
-ciclosretro_ensemble <- mapIds(org.Hs.eg.db, keys=ciclosretro,column="ENSEMBL", keytype = "UNIPROT")
-
+#Filtration of experimental data with intersection list
 hela_cr        <- helaprot[index_gene_help(helaprot),]
 tissue_cr      <- tissue_exp[index_gene_help(tissue_exp),]
 
-lista          <- c("Gene.ID", "Gene.Name","liver", "pituitary.gland", "hypothalamus", "stomach", "pancreas", "urinary.bladder",
+rm(tissue_exp, helaprot)
+tissue_filter  <- c("Gene.ID", "Gene.Name","liver", "pituitary.gland", "hypothalamus", "stomach", "pancreas", "urinary.bladder",
                     "prostate.gland", "adrenal.gland", "lung", "spleen", "amygdala", "vagina", "blood", 
                     "breast", "uterus", "ovary", "thyroid.gland","ectocervix","endocervix")
-tissue_cr      <- tissue_cr[,lista]
+tissue_cr      <- tissue_cr[,tissue_filter]
 
-#ordenação
-
+#Order data frames by ENSEMBL
 tissue_cr <- tissue_cr[order(tissue_cr$Gene.ID),]
 hela_cr <- hela_cr[order(hela_cr$Gene.ID),]
 
-#Criação de função que faça testes múltiplos de correlação contra o data frame hela_cr
+#Usage of a original function that does multiple correlation tests between HeLa RNAseq data and each chosen tissue
 
 library(devtools)
 library(easyGgplot2)
 
-
-Multiple_cor_tests(tissue_cr)
+TEST <- Multiple_cor_tests(tissue_cr)

@@ -24,6 +24,16 @@ The following code installs a package that includes the library ggplot2 (without
 <code>install.packages("tidyverse")</code><br>
 </p>
 
+<p><b>Raw data acquisition and description:</b><br>
+| Data base  | Description  | Linked Name  |
+|---|---|---|
+| Apid  | Phisycal interactions protein-protein, human interactome  | <a href="http://cicblade.dep.usal.es:8080/APID/init.action " target="_blank"></a>  |
+| Omnipath  | Gene regulation and signaling network  | <a href="http://omnipathdb.org/interactions/" target="_blank"></a>  |
+| Dorothea  |  Transcription factors annotation and their targets | <a href="https://omnipathdb.org/interactions/?datasets=tfregulons&tfregulons_levels=A,B" target="_blank"></a>  |
+| Atlas Expression  | Protein expression - proteomics and transcriptomics  | <a href="http://cicblade.dep.usal.es:8080/APID/init.action " target="_blank"></a>  |
+ 
+</p>  
+
 ## Authors
 <p>Pedro Fanica, Beatriz Simões, Marta Cruz e Diogo Quaresma</p>
 Faculdade de Ciências da Universidade de Lisboa - Bioquímica Experimental IV, Licenciatura em Bioquímica

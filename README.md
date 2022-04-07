@@ -24,15 +24,13 @@ The following code installs a package that includes the library ggplot2 (without
 <code>install.packages("tidyverse")</code><br>
 </p>
 
-<p><b>Raw data acquisition and description:</b><br>
-| Data base  | Description  | Linked Name  |
-|---|---|---|
-| Apid  | Phisycal interactions protein-protein, human interactome  | <a href="http://cicblade.dep.usal.es:8080/APID/init.action " target="_blank"></a>  |
-| Omnipath  | Gene regulation and signaling network  | <a href="http://omnipathdb.org/interactions/" target="_blank"></a>  |
-| Dorothea  |  Transcription factors annotation and their targets | <a href="https://omnipathdb.org/interactions/?datasets=tfregulons&tfregulons_levels=A,B" target="_blank"></a>  |
-| Atlas Expression  | Protein expression - proteomics and transcriptomics  | <a href="http://cicblade.dep.usal.es:8080/APID/init.action " target="_blank"></a>  |
- 
-</p>  
+<b>Raw data acquisition and description:</b>
+| Data base         | Description                                               | Document to source                            |
+|-------------------|-----------------------------------------------------------|-----------------------------------------------|
+| Apid              | Physical interactions protein-protein, human interactome  | <a href="http://cicblade.dep.usal.es:8080/APID/init.action " target="_blank">9606_noISI_Q2.txt</a>         |
+| Omnipath          | Gene regulation and signaling network                     | <a href="http://omnipathdb.org/interactions/" target="_blank">omnipathdb.txt</a>            |
+| Dorothea          | Transcription factors and targets annotation              | <a href="https://omnipathdb.org/interactions/?datasets=tfregulons&tfregulons_levels=A,B" target="_blank"> dorothea_AB.txt </a>  |
+| Atlas Expression  | Protein expression - proteomics and transcriptomics       | <ul><li><a href="https://www.ebi.ac.uk/gxa/experiments/E-MTAB-5214/Results " target="_blank">E-MTAB-5214-query-results.tsv</a> <li><a href="https://www.ebi.ac.uk/gxa/experiments/E-MTAB-2706/Results " target="_blank">HeLa_TPM_results.tsv</a></li></ul>|
 
 ## Authors
 <p>Pedro Fanica, Beatriz Simões, Marta Cruz e Diogo Quaresma</p>

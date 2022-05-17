@@ -96,9 +96,9 @@ hela_cr        <- helaprot[index_gene_help(helaprot),]
 tissue_cr      <- tissue_exp[index_gene_help(tissue_exp),]
 
 rm(tissue_exp, helaprot)
-tissue_filter  <- c("Gene.ID", "Gene.Name","liver", "pituitary.gland", "hypothalamus", "stomach", "pancreas", "urinary.bladder",
-                    "prostate.gland", "adrenal.gland", "lung", "spleen", "amygdala", "vagina", "blood", 
-                    "breast", "uterus", "ovary", "thyroid.gland","ectocervix","endocervix")
+tissue_filter  <- c("Gene.ID", "Gene.Name","liver", "stomach", "pancreas", "urinary.bladder",
+                    "prostate.gland", "lung", "adrenal.gland" , "skeletal.muscle.tissue" , "amygdala", 
+                    "breast", "uterus","ectocervix","endocervix")
 tissue_cr      <- tissue_cr[,tissue_filter]
 
 #Order data frames by ENSEMBL

@@ -93,13 +93,20 @@ Multiple_cor_tests <- function(test_table, base_table = hela_cr, xynames = c("Co
       sample_table_i <- test_table[index_gene_help(test_table, sample = corrected), i]
       
       #correlation test itself
-      test <- cor.test(sample_base, sample_table_i, method="pearson")
+      test  <- cor.test(sample_base, sample_table_i, method="spearman", exact= FALSE)
+      test1 <- cor.test(sample_base, sample_table_i, method="kendall", exact= FALSE)
+      
+      #normality test
+      test2 <- shapiro.test(sample_table_i) 
       
       #organization of information in the data frame, df, initially empty, in order to visualize it in the end
       df[i-2, 1] <- names[i]
       df[i-2, 2] <- test$estimate
       df[i-2, 3] <- test$p.value
-      df[i-2, 4] <- length(corrected)
+      df[i-2, 4] <- test1$estimate
+      df[i-2, 5] <- test2$p.value
+      df[i-2, 6] <- length(corrected)
+      df[i-2, 7] <- test2$p.value
     }
   }  
   
@@ -107,16 +114,16 @@ Multiple_cor_tests <- function(test_table, base_table = hela_cr, xynames = c("Co
     print("The following tissues were not elegible for correlation test with the data for the cancerous cell line HeLa:", not_possible)
   }
   
-  colnames(df) <- c("Tissues_to_compare","Correlation_coefficient","p_value", "Dimension")
-  df <- df[order(df$Correlation_coefficient),]
+  colnames(df) <- c("Tissues_to_compare","Spearman_Cor_coef","S_p_value", "Kendall_Cor_coef","K_p_value","Dimension", "SW Normality_test")
+  df <- df[order(df$Spearman_Cor_coef),]
   
   x_name <- xynames[1]
   y_name <- xynames[2]
   
   #Function explained in ggplot 2 forums and main web page
-  plot <- ggplot(df, aes(x = Correlation_coefficient, y=reorder(Tissues_to_compare, + Correlation_coefficient), fill = p_value)) +
-    labs(x = x_name, y = y_name)+
-    scale_fill_gradientn(trans = "log", breaks=c(1.0e-25, 1.0e-20, 1e-15, 1.0e-10, 1.0e-5, 1.0e-1), colors = colorspace::diverge_hcl(7))+
+  plot <- ggplot(df, aes(x = Spearman_Cor_coef, y=reorder(Tissues_to_compare, + Spearman_Cor_coef), fill = S_p_value)) +
+    labs(x = x_name, y = y_name, fill = "p value")+
+    scale_fill_gradientn(trans = "log",breaks=c(0.1,0.05,0.01, 0.001,0.0001), colors = colorspace::diverge_hcl(7))+
     geom_bar(stat="identity",color="black")+
     guides(fill = guide_colourbar(barwidth = 0.5, barheight = 10))+
     theme_classic()

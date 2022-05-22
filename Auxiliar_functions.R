@@ -62,7 +62,7 @@ index_gene_help <- function(df, sample=intersection){
 #RNAseq data for HeLa cell line, and various variables present in a data frame, corresponding here to
 #human tissues from GTEx data, all acquired from Atlas Expression
 
-Multiple_cor_tests <- function(test_table, base_table = hela_cr, xynames = c("Correlation coefficient, cf. HeLa", "Studied Tissues")){
+Multiple_cor_tests <- function(test_table, base_table = hela_cr, xynames = c("Correlation coefficient", "Studied Tissues")){
   #ARGUMENTS:
   #test_table - table that contain multiple variables to test with base_table
   #base_table - hela_cr by default, xynames - vector that includes the names of x and y plot's axis labels, in this order 
@@ -94,7 +94,7 @@ Multiple_cor_tests <- function(test_table, base_table = hela_cr, xynames = c("Co
       
       #correlation test itself
       test  <- cor.test(sample_base, sample_table_i, method="spearman", exact= FALSE)
-      test1 <- cor.test(sample_base, sample_table_i, method="kendall", exact= FALSE)
+      test1 <- cor.test(sample_base, sample_table_i, method="pearson", exact= FALSE)
       
       #normality test
       test2 <- shapiro.test(sample_table_i) 

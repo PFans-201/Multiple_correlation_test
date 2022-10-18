@@ -33,6 +33,6 @@
 
 
 <sup>i</sup> Data verified with 2 or more experimental evidences
-## Authors
-<p>Pedro Fanica, Beatriz Simões, Marta Cruz e Diogo Quaresma</p>
+## Author
+<p>Pedro Fanica</p>
 Faculdade de Ciências da Universidade de Lisboa - Bioquímica Experimental IV, Licenciatura em Bioquímica
